@@ -395,7 +395,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: cb659f2ee945c274eb8e136cf37edebc, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -730,7 +730,7 @@ GameObject:
   m_Component:
   - component: {fileID: 823738097}
   - component: {fileID: 823738099}
-  - component: {fileID: 823738098}
+  - component: {fileID: 823738100}
   m_Layer: 0
   m_Name: Player Container
   m_TagString: Untagged
@@ -755,21 +755,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &823738098
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 823738096}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e86c4fcc466a5e845aacfbcfaad5048d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _controller: {fileID: 0}
-  _cameraTransform: {fileID: 381927559}
-  _moveSpeed: 5
 --- !u!143 &823738099
 CharacterController:
   m_ObjectHideFlags: 0
@@ -788,6 +773,27 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &823738100
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 823738096}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e86c4fcc466a5e845aacfbcfaad5048d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cameraTransform: {fileID: 381927559}
+  _moveSpeed: 5
+  _defaultMaterial: {fileID: 2100000, guid: cb659f2ee945c274eb8e136cf37edebc, type: 2}
+  _invincibleMaterial: {fileID: 2100000, guid: 75e5f9a19389afd4dbde3587ac1ec527, type: 2}
+  _sprintingMaterial: {fileID: 2100000, guid: 13be0758fb628b844b1af43c7025b1c9, type: 2}
+  _bodyPart1: {fileID: 1309193033}
+  _bodyPart2: {fileID: 304164153}
+  _walkSpeed: 5
+  _sprintSpeed: 10
 --- !u!1 &1309193031
 GameObject:
   m_ObjectHideFlags: 0
@@ -842,7 +848,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: cb659f2ee945c274eb8e136cf37edebc, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
