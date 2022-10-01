@@ -2,6 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum MovementState 
+{
+    WALKING,
+    SPRINTING,
+    DODGING
+}
+
 [RequireComponent(typeof(CharacterController))]
 public class ThirdPersonMovement : MonoBehaviour
 {
@@ -12,15 +19,13 @@ public class ThirdPersonMovement : MonoBehaviour
     private float _turnSmoothTime = 0.1f; //Used to smooth the turn rate of the players visual
     private float _turnSmoothVelocity; //Used to smooth the turn rate of the players visual
     private bool _grounded;
-    
-
-    //Temporary
-    [Header("Temp")]
-    [SerializeField] private Material _defaultMaterial;
-    [SerializeField] private Material _invincibleMaterial;
-    [SerializeField] private Material _sprintingMaterial;
-    [SerializeField] private MeshRenderer _bodyPart1;
-    [SerializeField] private MeshRenderer _bodyPart2;
+    private bool _hasControl;
+    private bool _mobilityInput;
+    private bool _mobilityTrigger;
+    private float _mobilityInputTime;
+    private float _mobilityThreshold = 0.5f;
+    private MovementState _myMovementState;
+    public MovementState MyMovementState { get { return _myMovementState; } }
 
     [Header("Dodging and Sprinting")]
     //Sprint Variables
@@ -28,14 +33,12 @@ public class ThirdPersonMovement : MonoBehaviour
     [SerializeField] private float _sprintSpeed;
     private float _sprintWindDown = 0.5f;
     private bool _isSprinting;
-    private bool _sprintCheck;
     //Dodge Variables
     private float _invincibleDuration = 0.5f;
+    private bool _canDodge;
     private float _dodgeCooldown = 1.0f;
-    private bool _isDodging;
     private bool _isInvincible;
-    private bool _dodgeCheck;
-    [SerializeField] private float _dodgeInputTime;
+    private float _dodgeAngle;
 
 
     private void Awake()
@@ -44,12 +47,10 @@ public class ThirdPersonMovement : MonoBehaviour
         _controller = GetComponent<CharacterController>();
         _grounded = true;
         _moveSpeed = _walkSpeed;
-        _sprintCheck = false;
         _isSprinting = false;
-
-        //Temporary
-        _bodyPart1.material = _defaultMaterial;
-        _bodyPart2.material = _defaultMaterial;
+        _myMovementState = MovementState.WALKING;
+        _canDodge = true;
+        _hasControl = true;
 
         //Set cursor settings
         Cursor.lockState = CursorLockMode.Locked;
@@ -58,6 +59,10 @@ public class ThirdPersonMovement : MonoBehaviour
 
     void Update()
     {
+        MyInput();
+        Dodge();
+        Sprint();
+
         #region Generic Moving
         //Get the horizontal and vertical input, defaults to WASD and Arrow controlls
         float horizontalInput = Input.GetAxisRaw("Horizontal");
@@ -75,7 +80,7 @@ public class ThirdPersonMovement : MonoBehaviour
         }
 
         //If the direction is more than 0.1, which means if the player has inputted a move direction at all
-        if (direction.magnitude >= 0.1f) 
+        if (direction.magnitude >= 0.1f && _hasControl) 
         {
             //float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg; //This is an old line used if we don't want to inherit the direction from anything
 
@@ -94,74 +99,75 @@ public class ThirdPersonMovement : MonoBehaviour
             _controller.Move(moveDirection.normalized * _moveSpeed * Time.deltaTime);
         }
         #endregion
+    }
 
-        #region Sprinting
-
-        if (Input.GetKeyDown(KeyCode.Space) && !_sprintCheck) 
+    private void MyInput() 
+    {
+        if (Input.GetKeyDown(KeyCode.Space) && !_mobilityInput) 
         {
-            _sprintCheck = true;
-            RoutineBehavior.Instance.StartNewTimedAction(args => OnSprintStart(), TimedActionCountType.SCALEDTIME, _sprintWindDown);
+            _mobilityInputTime = 0;
+            _mobilityInput = true;
         }
-        if (Input.GetKeyUp(KeyCode.Space) && _sprintCheck) 
+        if (Input.GetKeyUp(KeyCode.Space) && _mobilityInput)
         {
-            _sprintCheck = false;
-            RoutineBehavior.Instance.StartNewTimedAction(args => OnSprintEnd(), TimedActionCountType.SCALEDTIME, _sprintWindDown / 2);
+            _mobilityInput = false;
+            _mobilityTrigger = true;
         }
-
-        #endregion
-
-        #region Dodging
-        if (Input.GetKeyDown(KeyCode.Space) && !_dodgeCheck) 
+        if (_mobilityInput) 
         {
-            _dodgeCheck = true;
-        }
-        if (Input.GetKeyUp(KeyCode.Space) && _dodgeCheck) 
-        {
-            _dodgeCheck = false;
-        }
-
-        if (_dodgeCheck) 
-        {
-            _dodgeInputTime += Time.deltaTime;
-        }
-
-        #endregion
-
-        if (_isInvincible)
-        {
-            _bodyPart1.material = _invincibleMaterial;
-            _bodyPart2.material = _invincibleMaterial;
-        }
-        else if (_isSprinting)
-        {
-            _bodyPart1.material = _sprintingMaterial;
-            _bodyPart2.material = _sprintingMaterial;
-        }
-        else if (!_isSprinting && !_isInvincible)
-        {
-            _bodyPart1.material = _defaultMaterial;
-            _bodyPart2.material = _defaultMaterial;
+            _mobilityInputTime += Time.deltaTime;
         }
     }
 
-    private void OnSprintStart() 
+    private void Dodge() 
     {
-        if (_sprintCheck)
+        if (_mobilityTrigger)
         {
-            _isSprinting = true;
+            _mobilityTrigger = false;
+            if (_mobilityInputTime <= _mobilityThreshold && _canDodge)
+            {
+                float inputX = Input.GetAxisRaw("Horizontal");
+                float inputY = Input.GetAxisRaw("Vertical");
+                Vector3 direction = new Vector3(inputX, 0.0f, inputY).normalized;
+                _dodgeAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + _cameraTransform.eulerAngles.y;
+
+                _canDodge = false;
+                _hasControl = false;
+                _isInvincible = true;
+                _myMovementState = MovementState.DODGING;
+                RoutineBehavior.Instance.StartNewTimedAction(args => _isInvincible = false, TimedActionCountType.SCALEDTIME, _invincibleDuration);
+                RoutineBehavior.Instance.StartNewTimedAction(args => _hasControl = true, TimedActionCountType.SCALEDTIME, _invincibleDuration);
+                RoutineBehavior.Instance.StartNewTimedAction(args => _myMovementState = MovementState.WALKING, TimedActionCountType.SCALEDTIME, _invincibleDuration);
+                RoutineBehavior.Instance.StartNewTimedAction(args => _canDodge = true, TimedActionCountType.SCALEDTIME, _dodgeCooldown);
+            }
+        }
+        if (_myMovementState == MovementState.DODGING) 
+        {
+            float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, _dodgeAngle, ref _turnSmoothVelocity, _turnSmoothTime);
+            transform.rotation = Quaternion.Euler(0.0f, angle, 0.0f);
+
+            Vector3 moveDirection = Quaternion.Euler(0.0f, _dodgeAngle, 0.0f) * Vector3.forward;
+
+            _controller.Move(moveDirection.normalized * (_moveSpeed * 5.0f) * Time.deltaTime);
         }
     }
 
-    private void OnSprintEnd() 
+    private void Sprint() 
     {
-        _isSprinting = false;
-    }
-
-    private void OnDodge() 
-    {
-        _isDodging = true;
-        _isInvincible = true;
-        RoutineBehavior.Instance.StartNewTimedAction(args => _isDodging = false, TimedActionCountType.SCALEDTIME, _dodgeCooldown);
-        RoutineBehavior.Instance.StartNewTimedAction(args => _isInvincible = false, TimedActionCountType.SCALEDTIME, _invincibleDuration);
+        if (_mobilityInput)
+        {
+            if (_mobilityInputTime >= _mobilityThreshold)
+            {
+                _isSprinting = true;
+                if(_myMovementState != MovementState.DODGING)
+                    _myMovementState = MovementState.SPRINTING;
+            }
+        }
+        else 
+        {
+            _isSprinting = false;
+            if (_myMovementState != MovementState.DODGING)
+                _myMovementState = MovementState.WALKING;
+        }
     }
 }

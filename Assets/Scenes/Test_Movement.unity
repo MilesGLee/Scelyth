@@ -449,7 +449,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 373274204}
-  m_LocalRotation: {x: 0.11701424, y: -0.00000001708818, z: 0.000000002013392, w: 0.99313027}
+  m_LocalRotation: {x: 0.11701424, y: 0.000000017088176, z: -0.0000000020133915, w: 0.99313027}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -580,7 +580,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 381927556}
-  m_LocalRotation: {x: 0.117014244, y: -0.00000003417636, z: 0.000000004026784, w: 0.99313027}
+  m_LocalRotation: {x: 0.117014244, y: 0.00000003417636, z: -0.000000004026784, w: 0.99313027}
   m_LocalPosition: {x: 0, y: 6.8, z: -18}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -731,6 +731,7 @@ GameObject:
   - component: {fileID: 823738097}
   - component: {fileID: 823738099}
   - component: {fileID: 823738100}
+  - component: {fileID: 823738101}
   m_Layer: 0
   m_Name: Player Container
   m_TagString: Untagged
@@ -787,13 +788,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _cameraTransform: {fileID: 381927559}
   _moveSpeed: 5
-  _defaultMaterial: {fileID: 2100000, guid: cb659f2ee945c274eb8e136cf37edebc, type: 2}
-  _invincibleMaterial: {fileID: 2100000, guid: 75e5f9a19389afd4dbde3587ac1ec527, type: 2}
-  _sprintingMaterial: {fileID: 2100000, guid: 13be0758fb628b844b1af43c7025b1c9, type: 2}
-  _bodyPart1: {fileID: 1309193033}
-  _bodyPart2: {fileID: 304164153}
   _walkSpeed: 5
   _sprintSpeed: 10
+--- !u!114 &823738101
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 823738096}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31279a56bd2b8154e839c66eebbd164e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _walkMaterial: {fileID: 2100000, guid: cb659f2ee945c274eb8e136cf37edebc, type: 2}
+  _sprintMaterial: {fileID: 2100000, guid: 13be0758fb628b844b1af43c7025b1c9, type: 2}
+  _dodgeMaterial: {fileID: 2100000, guid: 75e5f9a19389afd4dbde3587ac1ec527, type: 2}
+  _meshes:
+  - {fileID: 1309193033}
+  - {fileID: 304164153}
 --- !u!1 &1309193031
 GameObject:
   m_ObjectHideFlags: 0
