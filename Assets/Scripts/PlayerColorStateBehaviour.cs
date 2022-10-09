@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerColorStateBehavior : MonoBehaviour
+public class PlayerColorStateBehaviour : MonoBehaviour
 {
     private ThirdPersonMovement _thirdPersonMovement;
     [SerializeField] private Material _walkMaterial;

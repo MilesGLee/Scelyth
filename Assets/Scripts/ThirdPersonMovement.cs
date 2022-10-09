@@ -24,6 +24,7 @@ public class ThirdPersonMovement : MonoBehaviour
     private bool _mobilityTrigger;
     private float _mobilityInputTime;
     private float _mobilityThreshold = 0.5f;
+    [SerializeField] private FocusBehaviour _focus;
     private MovementState _myMovementState;
     public MovementState MyMovementState { get { return _myMovementState; } }
 
@@ -79,24 +80,26 @@ public class ThirdPersonMovement : MonoBehaviour
             _moveSpeed = _walkSpeed;
         }
 
-        //If the direction is more than 0.1, which means if the player has inputted a move direction at all
         if (direction.magnitude >= 0.1f && _hasControl) 
         {
-            //float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg; //This is an old line used if we don't want to inherit the direction from anything
+            if (!_focus.IsFocused)
+            {
+                float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + _cameraTransform.eulerAngles.y;
+                float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref _turnSmoothVelocity, _turnSmoothTime);
+                transform.rotation = Quaternion.Euler(0.0f, angle, 0.0f);
+                Vector3 moveDirection = Quaternion.Euler(0.0f, targetAngle, 0.0f) * Vector3.forward;
 
-            //Get the target angle the player needs to rotate towards, inheriting the cameras direction, so moving forwards will always be in the direction the camera is facing
-            float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + _cameraTransform.eulerAngles.y;
-            //Use math smooth damp angle to create a turn rate over time to rotate the player in, rather than having the player snap instantly to the desired angle
-            float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref _turnSmoothVelocity, _turnSmoothTime);
-            //Rotate the player transform
-            transform.rotation = Quaternion.Euler(0.0f, angle, 0.0f);
+                _controller.Move(moveDirection.normalized * _moveSpeed * Time.deltaTime);
+            }
+            if (_focus.IsFocused) 
+            {
+                float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + _cameraTransform.eulerAngles.y;
+                float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, _cameraTransform.eulerAngles.y, ref _turnSmoothVelocity, _turnSmoothTime);
+                transform.rotation = Quaternion.Euler(0.0f, angle, 0.0f);
+                Vector3 moveDir = Quaternion.Euler(0.0f, targetAngle, 0.0f) * Vector3.forward;
 
-            //Create a move direction using the inhertied direction from the camera, and multiply it by the forward vector
-            Vector3 moveDirection = Quaternion.Euler(0.0f, targetAngle, 0.0f) * Vector3.forward;
-            //_controller.Move(direction * _moveSpeed * Time.deltaTime); //This is an old line used if we don't want to inherit the direction from anything
-
-            //Move the character controller in the move direction
-            _controller.Move(moveDirection.normalized * _moveSpeed * Time.deltaTime);
+                _controller.Move(moveDir.normalized * _moveSpeed * Time.deltaTime);
+            }
         }
         #endregion
     }
@@ -135,10 +138,10 @@ public class ThirdPersonMovement : MonoBehaviour
                 _hasControl = false;
                 _isInvincible = true;
                 _myMovementState = MovementState.DODGING;
-                RoutineBehavior.Instance.StartNewTimedAction(args => _isInvincible = false, TimedActionCountType.SCALEDTIME, _invincibleDuration);
-                RoutineBehavior.Instance.StartNewTimedAction(args => _hasControl = true, TimedActionCountType.SCALEDTIME, _invincibleDuration);
-                RoutineBehavior.Instance.StartNewTimedAction(args => _myMovementState = MovementState.WALKING, TimedActionCountType.SCALEDTIME, _invincibleDuration);
-                RoutineBehavior.Instance.StartNewTimedAction(args => _canDodge = true, TimedActionCountType.SCALEDTIME, _dodgeCooldown);
+                RoutineBehaviour.Instance.StartNewTimedAction(args => _isInvincible = false, TimedActionCountType.SCALEDTIME, _invincibleDuration);
+                RoutineBehaviour.Instance.StartNewTimedAction(args => _hasControl = true, TimedActionCountType.SCALEDTIME, _invincibleDuration);
+                RoutineBehaviour.Instance.StartNewTimedAction(args => _myMovementState = MovementState.WALKING, TimedActionCountType.SCALEDTIME, _invincibleDuration);
+                RoutineBehaviour.Instance.StartNewTimedAction(args => _canDodge = true, TimedActionCountType.SCALEDTIME, _dodgeCooldown);
             }
         }
         if (_myMovementState == MovementState.DODGING) 

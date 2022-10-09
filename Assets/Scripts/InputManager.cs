@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class InputManager
+public class InputManager : MonoBehaviour
 {
     private KeyCode _mobility = KeyCode.Space;
     private KeyCode _focus = KeyCode.Mouse2;

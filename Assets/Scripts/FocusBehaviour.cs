@@ -3,20 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
 
-public class FocusBehavior : MonoBehaviour
+public class FocusBehaviour : MonoBehaviour
 {
-    private Camera _camera;
-    [SerializeField] private CinemachineFreeLook _cinemachine;
+    [SerializeField] private Camera _camera;
+    [SerializeField] private CinemachineBrain _cinemachine;
     [SerializeField] private Transform _playerGFX;
     private FocusObject[] _focusObjects;
     private Transform _target;
 
     private InputManager _input;
 
+    public bool IsFocused;
+
     void Start()
     {
         _target = null;
-        _camera = Camera.main;
 
         _focusObjects = GameObject.FindObjectsOfType<FocusObject>();
     }
@@ -44,15 +45,18 @@ public class FocusBehavior : MonoBehaviour
             }
             else 
             {
-                //_cinemachine.LookAt = _playerGFX;
+                _cinemachine.enabled = true;
                 _target = null;
+                IsFocused = false;
             }
         }
 
         if (_target != null) 
         {
-            //_cinemachine.LookAt = _target;
+            _camera.transform.localPosition = new Vector3(0.0f, 5.0f, -18.0f);
+            _cinemachine.enabled = false;
             _camera.transform.LookAt(_target);
+            IsFocused = true;
         }
     }
 }

@@ -25,7 +25,7 @@ public enum TimedActionCountType
     FRAME
 }
 
-public class RoutineBehavior : MonoBehaviour
+public class RoutineBehaviour : MonoBehaviour
 {
     /// <summary>
     /// An event that's called when a timer is up.
@@ -62,21 +62,21 @@ public class RoutineBehavior : MonoBehaviour
 
     private List<TimedAction> _timedActions = new List<TimedAction>();
 
-    private static RoutineBehavior _instance;
+    private static RoutineBehaviour _instance;
 
-    public static RoutineBehavior Instance
+    public static RoutineBehaviour Instance
     {
         get
         {
             if (!_instance)
             {
-                _instance = FindObjectOfType<RoutineBehavior>();
+                _instance = FindObjectOfType<RoutineBehaviour>();
             }
 
             if (!_instance)
             {
                 GameObject timer = new GameObject("TimerObject");
-                _instance = timer.AddComponent<RoutineBehavior>();
+                _instance = timer.AddComponent<RoutineBehaviour>();
             }
 
             return _instance;
